@@ -24,11 +24,36 @@ class FirestoreRepository(
             .collection("esp32_firestore")
             .document("measurements")
             .get()
-            .await() // czekaj asynchronicznie na wynik
+            .await()
 
         val data = snapshot.data
         return mapDocumentToTank(data) ?: Tank(500, 1000, false)
     }
+
+    suspend fun updateTankCapacity(newCapacity: Int) {
+        firestore
+            .collection("esp32_firestore")
+            .document("measurements")
+            .update("tank_size", newCapacity)
+            .await()
+    }
+
+    suspend fun updateWaterLevel(newLevel: Int)  {
+        firestore
+            .collection("esp32_firestore")
+            .document("measurements")
+            .update("water_condition", newLevel)
+            .await()
+    }
+
+    suspend fun updateRunPump(isPumpOn: Boolean) {
+        firestore
+            .collection("esp32_firestore")
+            .document("measurements")
+            .update("user_run_pomp", isPumpOn)
+            .await()
+    }
+
 
     private fun mapDocumentToMeasure(data: Map<String, Any>?): Measure? {
         if (data == null) return null

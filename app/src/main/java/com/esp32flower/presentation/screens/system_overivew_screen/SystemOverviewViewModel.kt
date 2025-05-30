@@ -32,6 +32,9 @@ class SystemOverviewViewModel(
                         )
                     )
                 }
+                viewModelScope.launch {
+                    firestoreRepository.updateTankCapacity(action.newCapacity)
+                }
             }
             is SystemOverviewAction.OnRefillTankClick -> {
                 _state.update {
@@ -41,6 +44,9 @@ class SystemOverviewViewModel(
                         )
                     )
                 }
+                viewModelScope.launch {
+                    firestoreRepository.updateWaterLevel(state.value.tankInfo.waterLevel)
+                }
             }
             is SystemOverviewAction.OnRunPumpClick -> {
                 _state.update {
@@ -49,6 +55,9 @@ class SystemOverviewViewModel(
                             isPumpOn = action.isPumpOn
                         )
                     )
+                }
+                viewModelScope.launch {
+                    firestoreRepository.updateRunPump(action.isPumpOn)
                 }
             }
             is SystemOverviewAction.OnSelectedSensorChange -> {
