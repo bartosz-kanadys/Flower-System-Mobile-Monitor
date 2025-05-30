@@ -1,5 +1,6 @@
 package com.esp32flower.presentation.screens.system_overivew_screen
 
+import android.icu.text.SimpleDateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,7 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -38,8 +38,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.esp32flower.presentation.screens.system_overivew_screen.components.JetpackComposeBasicLineChart
 import com.esp32flower.presentation.theme.Esp32FlowerTheme
 import org.koin.compose.viewmodel.koinViewModel
+import java.util.Locale
 
 @Composable
 fun SystemOverviewScreenRoot(
@@ -49,7 +51,8 @@ fun SystemOverviewScreenRoot(
 
     SystemOverviewScreen(
         state = state,
-        onAction = viewModel::onAction
+        viewModel = viewModel,
+        onAction = viewModel::onAction,
     )
 }
 
@@ -57,13 +60,16 @@ fun SystemOverviewScreenRoot(
 @Composable
 fun SystemOverviewScreen(
     state: SystemOverviewState,
-    onAction: (SystemOverviewAction) -> Unit
-
+    viewModel: SystemOverviewViewModel,
+    onAction: (SystemOverviewAction) -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    var expandedDay by rememberSaveable { mutableStateOf(false) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var newCapacity by rememberSaveable { mutableStateOf("") }
+    var selectedDay by rememberSaveable { mutableStateOf("2025-05-25") }
 
+    val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     AnimatedVisibility(showDialog) {
         AlertDialog(
@@ -134,7 +140,9 @@ fun SystemOverviewScreen(
                 onValueChange = {},
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor().fillMaxWidth()
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
 
             )
             ExposedDropdownMenu(
@@ -156,10 +164,79 @@ fun SystemOverviewScreen(
                 }
             }
         }
+
+        val uniqueDays: List<String> = state.measures
+            .map { dateFormatter.format(it.time.toDate()) }
+            .distinct()
+            .sorted()
+
+        Text(
+            text = "Select day:",
+        )
+        ExposedDropdownMenuBox(
+            expanded = expandedDay,
+            onExpandedChange = {
+                expandedDay = !expandedDay
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            TextField(
+                value = selectedDay,
+                onValueChange = {
+                    selectedDay = it
+                },
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth()
+
+            )
+            ExposedDropdownMenu(
+                expanded = expandedDay,
+                onDismissRequest = { expandedDay = false },
+                shape = RoundedCornerShape(
+                    bottomEnd = 16.dp,
+                    bottomStart = 16.dp
+                )
+            ) {
+                uniqueDays.forEach { item ->
+                    DropdownMenuItem(
+                        text = { Text(text = item) },
+                        onClick = {
+                            selectedDay = item
+                            expandedDay = false
+
+                        }
+                    )
+                }
+            }
+        }
+
+        AnimatedVisibility(!state.isLoading) {
+            if (state.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(20.dp)
+                )
+            } else {
+                JetpackComposeBasicLineChart(
+                    viewModel = viewModel,
+                    state = state,
+                    selectedDay = selectedDay,
+                    selectedSensor = state.selectedSensor,
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                )
+            }
+        }
         Text(
             text = "Water level: ${state.tankInfo.waterLevel}/${state.tankInfo.tankSize} ml",
             textAlign = TextAlign.Start,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 20.dp)
         )
         LinearProgressIndicator(
             progress = { state.tankInfo.waterLevel / state.tankInfo.tankSize.toFloat() },
@@ -177,7 +254,7 @@ fun SystemOverviewScreen(
                 .fillMaxWidth()
                 .padding(top = 10.dp)
         ) {
-            Text( text = "Water at the next measurement: ")
+            Text(text = "Water at the next measurement: ")
             Switch(
                 checked = state.tankInfo.isPumpOn,
                 onCheckedChange = {
@@ -196,14 +273,14 @@ fun SystemOverviewScreen(
                     showDialog = true
                 }
             ) {
-                Text( text = "Change tank capacity")
+                Text(text = "Change tank capacity")
             }
             Button(
                 onClick = {
                     onAction(SystemOverviewAction.OnRefillTankClick)
                 }
             ) {
-                Text( text = "Fill tank")
+                Text(text = "Fill tank")
             }
         }
         Button(

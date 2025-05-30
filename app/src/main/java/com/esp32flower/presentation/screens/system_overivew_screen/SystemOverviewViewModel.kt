@@ -1,5 +1,6 @@
 package com.esp32flower.presentation.screens.system_overivew_screen
 
+import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.esp32flower.data.FirestoreRepository
@@ -7,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 class SystemOverviewViewModel(
     private val firestoreRepository: FirestoreRepository
@@ -14,6 +16,8 @@ class SystemOverviewViewModel(
 
     private val _state = MutableStateFlow(SystemOverviewState())
     val state = _state.asStateFlow()
+    val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val formatter = SimpleDateFormat("HH:mm", Locale.getDefault())
 
     init {
        loadDataFromFirestore()
@@ -92,5 +96,31 @@ class SystemOverviewViewModel(
                 _state.update { it.copy(isLoading = false) } // ustaw false po zakończeniu
             }
         }
+    }
+
+    fun calculateMeasure(selectedDay: String, selectedSensor: SensorType): List<Float> {
+        return state.value.measures
+            .sortedBy { it.time }
+            .filter { dateFormatter.format(it.time.toDate()) == selectedDay }
+            .map { when(selectedSensor) {
+                SensorType.AIR_TEMP  -> it.airTemperature
+                SensorType.AIR_HUMIDITY  -> it.airHumidity
+                SensorType.SOIL_HUMIDITY -> (it.soilHumidity / 4095) * 100
+                SensorType.LIGHT_INTENSITY -> (it.lightIntensity / 4095) * 100
+            } }
+    }
+
+    fun calculateTime(selectedDay: String): List<String> {
+        val timestampInSelectedDay = state.value.measures
+            .sortedBy { it.time }
+            .filter { dateFormatter.format(it.time.toDate()) == selectedDay }
+            .map {
+                it.time
+            }
+
+        val timeStrings: List<String> = timestampInSelectedDay.map { measure ->
+            formatter.format(measure.toDate()) // <-- KONWERSJA Timestamp → Date
+        }
+        return timeStrings
     }
 }

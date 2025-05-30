@@ -57,6 +57,11 @@ dependencies {
     // Declare the dependency for the Firestore library
     implementation ("com.google.firebase:firebase-firestore-ktx")
 
+    implementation(libs.vico.core)
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m2)
+    implementation(libs.vico.compose.m3)
+    implementation(libs.vico.views)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
