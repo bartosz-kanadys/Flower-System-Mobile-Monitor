@@ -6,6 +6,8 @@ data class SystemOverviewState(
     val airHumidity: Float = 0f,
     val soilHumidity: Float = 0f,
     val lightIntensity: Float = 0f,
-    val waterLevel: Int = 1000,
+    val waterLevel: Int = 500,
     val isPumpOn: Boolean = false,
+    val selectedSensor: SensorType = SensorType.AIR_TEMP,
+    val tankSize: Int = 1000
 )
