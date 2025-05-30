@@ -32,7 +32,11 @@ class SystemOverviewViewModel(
                 }
             }
             is SystemOverviewAction.OnRunPumpClick -> {
-                TODO()
+                _state.update {
+                    it.copy(
+                        isPumpOn = action.isPumpOn
+                    )
+                }
             }
             is SystemOverviewAction.OnSelectedSensorChange -> {
                _state.update {

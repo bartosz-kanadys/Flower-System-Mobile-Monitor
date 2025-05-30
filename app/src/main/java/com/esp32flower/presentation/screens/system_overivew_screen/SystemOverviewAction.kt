@@ -2,7 +2,7 @@ package com.esp32flower.presentation.screens.system_overivew_screen
 
 sealed interface SystemOverviewAction {
     data class OnClickWaterSettings(val newCapacity: Int): SystemOverviewAction
-    data object OnRunPumpClick: SystemOverviewAction
+    data class OnRunPumpClick(val isPumpOn: Boolean): SystemOverviewAction
     data class OnChangeGraphClick(val sensor: SensorType): SystemOverviewAction
     data object OnRefillTankClick: SystemOverviewAction
     data class OnSelectedSensorChange(val sensor: SensorType): SystemOverviewAction
