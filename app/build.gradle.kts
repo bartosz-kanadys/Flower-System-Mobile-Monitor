@@ -40,6 +40,15 @@ android {
 }
 
 dependencies {
+    val koin_version = "4.0.4"
+
+    //KOIN
+    implementation("io.insert-koin:koin-core:$koin_version")
+    implementation("io.insert-koin:koin-android:$koin_version")
+    implementation("io.insert-koin:koin-compose:$koin_version")
+    implementation("io.insert-koin:koin-compose-viewmodel:$koin_version")
+    implementation("io.insert-koin:koin-compose-viewmodel-navigation:$koin_version")
+
     // Import the BoM for the Firebase platform
     implementation(platform("com.google.firebase:firebase-bom:31.0.0"))
 
