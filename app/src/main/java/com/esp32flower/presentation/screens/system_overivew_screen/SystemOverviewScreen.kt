@@ -10,12 +10,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -107,6 +112,12 @@ fun SystemOverviewScreen(
             .padding(top = 24.dp, start = 30.dp, end = 30.dp)
 
     ) {
+        AnimatedVisibility(state.isLoading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .padding(20.dp)
+            )
+        }
         Text(
             text = "Select sensor:",
         )
@@ -146,13 +157,13 @@ fun SystemOverviewScreen(
             }
         }
         Text(
-            text = "Water level: ${state.waterLevel}/${state.tankSize} ml",
+            text = "Water level: ${state.tankInfo.waterLevel}/${state.tankInfo.tankSize} ml",
             textAlign = TextAlign.Start,
             modifier = Modifier.fillMaxWidth()
         )
         LinearProgressIndicator(
-            progress = { state.waterLevel / state.tankSize.toFloat() },
-            color = if (state.waterLevel < 100) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
+            progress = { state.tankInfo.waterLevel / state.tankInfo.tankSize.toFloat() },
+            color = if (state.tankInfo.waterLevel < 100) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
             gapSize = 0.dp,
             modifier = Modifier
                 .padding(top = 10.dp)
@@ -168,7 +179,7 @@ fun SystemOverviewScreen(
         ) {
             Text( text = "Water at the next measurement: ")
             Switch(
-                checked = state.isPumpOn,
+                checked = state.tankInfo.isPumpOn,
                 onCheckedChange = {
                     onAction(SystemOverviewAction.OnRunPumpClick(it))
                 }
@@ -194,6 +205,21 @@ fun SystemOverviewScreen(
             ) {
                 Text( text = "Fill tank")
             }
+        }
+        Button(
+            onClick = {
+                onAction(SystemOverviewAction.OnRefreshClick)
+            }
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = "Refresh"
+            )
+            Text(
+                text = "Refresh",
+                textAlign = TextAlign.Start,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

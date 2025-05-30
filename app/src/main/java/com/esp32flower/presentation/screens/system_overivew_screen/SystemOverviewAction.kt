@@ -6,6 +6,7 @@ sealed interface SystemOverviewAction {
     data class OnChangeGraphClick(val sensor: SensorType): SystemOverviewAction
     data object OnRefillTankClick: SystemOverviewAction
     data class OnSelectedSensorChange(val sensor: SensorType): SystemOverviewAction
+    data object OnRefreshClick: SystemOverviewAction
 }
 
 enum class SensorType(val sensorName: String){

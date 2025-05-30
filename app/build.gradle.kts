@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
+
 }
 
 android {
@@ -50,7 +52,7 @@ dependencies {
     implementation("io.insert-koin:koin-compose-viewmodel-navigation:$koin_version")
 
     // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:31.0.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
 
     // Declare the dependency for the Firestore library
     implementation ("com.google.firebase:firebase-firestore-ktx")
