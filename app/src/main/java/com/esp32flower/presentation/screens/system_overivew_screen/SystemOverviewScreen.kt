@@ -63,13 +63,15 @@ fun SystemOverviewScreen(
     viewModel: SystemOverviewViewModel,
     onAction: (SystemOverviewAction) -> Unit,
 ) {
+    val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val latestMeasureTime = state.measures.maxOf { it.time }.toDate()
+    val latestMeasureDay = dateFormatter.format(latestMeasureTime)
+
     var expanded by rememberSaveable { mutableStateOf(false) }
     var expandedDay by rememberSaveable { mutableStateOf(false) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var newCapacity by rememberSaveable { mutableStateOf("") }
-    var selectedDay by rememberSaveable { mutableStateOf("2025-05-25") }
-
-    val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    var selectedDay by rememberSaveable { mutableStateOf(latestMeasureDay) }
 
     AnimatedVisibility(showDialog) {
         AlertDialog(

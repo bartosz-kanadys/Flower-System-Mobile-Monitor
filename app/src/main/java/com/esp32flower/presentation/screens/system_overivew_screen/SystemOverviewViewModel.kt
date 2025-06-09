@@ -105,8 +105,8 @@ class SystemOverviewViewModel(
             .map { when(selectedSensor) {
                 SensorType.AIR_TEMP  -> it.airTemperature
                 SensorType.AIR_HUMIDITY  -> it.airHumidity
-                SensorType.SOIL_HUMIDITY -> (it.soilHumidity / 4095) * 100
-                SensorType.LIGHT_INTENSITY -> (it.lightIntensity / 4095) * 100
+                SensorType.SOIL_HUMIDITY -> ((4095 - it.soilHumidity) / 4095) * 100
+                SensorType.LIGHT_INTENSITY -> ((4095 - it.lightIntensity) / 4095) * 100
             } }
     }
 
